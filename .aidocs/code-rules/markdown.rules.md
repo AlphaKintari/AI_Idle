@@ -1,3 +1,4 @@
+
 # Markdown (.md) File Best Practices
 
 For a complete guide, see: [Markdown Guide - Basic Syntax](https://www.markdownguide.org/basic-syntax/)
@@ -25,6 +26,9 @@ For a complete guide, see: [Markdown Guide - Basic Syntax](https://www.markdowng
 - **Escaping Characters:** Use a backslash (e.g., `\*` for a literal asterisk).
 - **HTML:** Use only if necessary; not all Markdown processors support HTML.
 
----
+## Mandatory Rule
 
-For more details and examples, visit the [Markdown Guide](https://www.markdownguide.org/basic-syntax/).
+After editing any markdown file, you must check for formatting or linting issues and fix all problems before considering the task complete.
+
+---
+For more details and examples, visit the [Markdown Guide](https://www.markdownguide.org/basic-syntax/)
