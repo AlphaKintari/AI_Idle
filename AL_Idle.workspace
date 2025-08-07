@@ -1,0 +1,17 @@
+{
+    "folders": [
+        {
+            "path": ".aidocs",
+            "name": "📄 .aidocs"
+        },
+        {
+            "path": ".copilot",
+            "name": "🤖 .copilot"
+        },
+        {
+            "path": ".powershell",
+            "name": "💠 .powershell"
+        }
+    ],
+    "settings": {}
+}
