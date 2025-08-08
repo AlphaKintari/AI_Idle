@@ -23,7 +23,12 @@ Idle games (also known as incremental, clicker, or tap games) are a genre of vid
 
 Idle games are praised for their low-pressure, distraction-friendly gameplay and constant sense of progress. Critics sometimes describe them as "glorified spreadsheets" but acknowledge their broad appeal and influence on game design.
 
-## Notable Titles
+
+
+## Additional References
+
+- [Evolve Incremental: Research Summary](./evolve-incremental.md)
+- [Fool's War by Sarah Zettel: Synopsis and AI Concepts](./fools-war.md)
 
 - Progress Quest
 - Cow Clicker
@@ -34,6 +39,7 @@ Idle games are praised for their low-pressure, distraction-friendly gameplay and
 - Kittens Game
 
 - [Universal Paperclips](https://www.decisionproblem.com/paperclips/index2.html)
+- [Evolve Incremental](https://pmotschmann.github.io/Evolve/wiki.html)
 
 ## Further Reading
 
