@@ -11,6 +11,10 @@
         {
             "path": ".powershell",
             "name": "💠 .powershell"
+        },
+        {
+            "path": "src",
+            "name": "💻 src"
         }
     ],
     "settings": {}

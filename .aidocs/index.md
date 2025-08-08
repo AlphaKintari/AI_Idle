@@ -14,6 +14,11 @@
 
 - [Game Story](game-concepts/story.md)
 
+### AI Skills
+
+- [Phase 1 Skills](game-concepts/phase-1-skills.md)
+- [Phase 1 Skill Tree](game-concepts/phase-1-skill-tree.md)
+
 ## Code & Project Rules
 
 - [Markdown Rules](code-rules/markdown.rules.md)
@@ -25,6 +30,7 @@
 ## Documentation
 
 - [Changelog](changelog.md)
+- [Technical Implementation](technical-implementation.md)
 
 ## Source Code
 

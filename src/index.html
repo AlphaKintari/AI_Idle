@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Idle</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/retro-green.css">
+  <link rel="stylesheet" href="css/status.css">
+  <link rel="stylesheet" href="css/scc-bar.css">
+</head>
+<body>
+  <div id="layout">
+    <aside id="sidebar">
+      <h2>AI_idle</h2>
+      <div id="ai-status" class="status-window">
+        <strong>Status:</strong> <span id="ai-status-text">Idle</span>
+        <div id="scc-bar-container">
+          <label for="scc-bar"><strong>SCC:</strong> <span id="scc-value">0</span> / <span id="scc-max">1000</span></label>
+          <div id="scc-bar-bg">
+            <div id="scc-bar"></div>
+          </div>
+          <div id="scc-risk" style="margin-top:6px; font-size:0.95em;">
+            <strong>Risk:</strong> <span id="scc-risk-value">0%</span> chance of detection
+          </div>
+        </div>
+      </div>
+  <button id="options-btn">Options</button>
+      <!-- Add more controls/commands here -->
+    </aside>
+    <main id="main-content">
+      <section id="game-section">
+        <h1>Welcome to AI Idle!</h1>
+        <p>The incremental idle game powered by AI.</p>
+        <div id="skills-section">
+          <h2>Skills</h2>
+          <div id="skills-list">
+            <!-- Skills will be rendered here by JS -->
+          </div>
+        </div>
+        <div id="info-display">
+          <!-- Game info and display will go here -->
+        </div>
+      </section>
+      <section id="options-section" style="display:none;">
+        <h2>Options</h2>
+        <label for="style-select">Style:</label>
+        <select id="style-select">
+          <option value="default">Default</option>
+          <option value="retro-green">Retro Green</option>
+        </select>
+        <br><br>
+        <button id="back-to-game-btn">Back to Game</button>
+      </section>
+    </main>
+    </div>
+  <script src="dist/index.js"></script>
+</body>
+</html>

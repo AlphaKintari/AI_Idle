@@ -1,0 +1,33 @@
+body.retro-green {
+  background: #101c10;
+  color: #39ff14;
+}
+
+#sidebar.retro-green, .modal-content.retro-green {
+  background: #142414;
+  color: #39ff14;
+}
+
+#main-content.retro-green {
+  background: #101c10;
+  color: #39ff14;
+}
+
+button.retro-green {
+  background: #1a3d1a;
+  color: #39ff14;
+  border: 1px solid #39ff14;
+}
+
+button.retro-green:hover {
+  background: #39ff14;
+  color: #101c10;
+}
+
+.modal.retro-green {
+  background: rgba(16, 28, 16, 0.85);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #39ff14;
+}

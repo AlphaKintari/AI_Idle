@@ -1,0 +1,16 @@
+#ai-status.status-window {
+  width: 100%;
+  background: #181c20;
+  color: #4f8cff;
+  border: 1px solid #333a44;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 24px;
+  font-size: 1em;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+#ai-status strong {
+  color: #fff;
+}
