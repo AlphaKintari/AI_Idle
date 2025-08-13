@@ -1,11 +1,24 @@
-// --- Skills System ---
+// --- Skills System with Allocation ---
 type SkillKey = 'computation' | 'memory';
+
+interface SkillAllocation {
+  percentage: number;          // 0-100, allocation percentage
+  xp: number;                 // Accumulated XP toward next level
+  xpRequired: number;         // XP needed for next level
+}
+
 interface Skill {
   key: SkillKey;
   name: string;
   desc: string;
   level: number;
-  baseCost: number;
+  allocation: SkillAllocation;
+}
+
+function calculateXPRequirement(level: number): number {
+  const BASE_XP = 100;
+  const MULTIPLIER = 1.5;
+  return Math.floor(BASE_XP * Math.pow(MULTIPLIER, level - 1));
 }
 
 const skills: Record<SkillKey, Skill> = {
@@ -14,70 +27,250 @@ const skills: Record<SkillKey, Skill> = {
     name: 'Computation',
     desc: 'Increases SCC generation rate. Each level adds +1 SCC per tick.',
     level: 1,
-    baseCost: 10,
+    allocation: {
+      percentage: 50,
+      xp: 0,
+      xpRequired: calculateXPRequirement(2)
+    }
   },
   memory: {
     key: 'memory',
     name: 'Memory',
-    desc: 'Expands information storage. (Future: increases Max SCC and unlocks advanced skills.)',
+    desc: 'Expands information storage capacity. Each level adds +50 Max SCC.',
     level: 1,
-    baseCost: 10,
+    allocation: {
+      percentage: 30,
+      xp: 0,
+      xpRequired: calculateXPRequirement(2)
+    }
   },
 };
 
-function getSkillCost(skill: Skill): number {
-  // Example: cost doubles each level
-  return skill.baseCost * Math.pow(2, skill.level - 1);
-}
+let totalAllocationPercentage = 80; // 50% + 30% initial allocation
+const MAX_ALLOCATION = 100;
 
 function renderSkills() {
   const skillsList = document.getElementById('skills-list');
   if (!skillsList) return;
   skillsList.innerHTML = '';
-    Object.values(skills).forEach((skill) => {
-      const skillDiv = document.createElement('div');
-      skillDiv.className = 'skill';
-      let effectDetail = '';
-      if (skill.key === 'computation') {
-        effectDetail = `<div class="skill-effect">Current Effect: +${skill.level} SCC/tick</div>`;
-      } else if (skill.key === 'memory') {
-        effectDetail = `<div class="skill-effect">Current Effect: Max SCC = ${100 + (skill.level - 1) * 50}</div>`;
-      }
-      skillDiv.innerHTML = `
-        <div class="skill-header">
-          <span class="skill-name">${skill.name} (Lv. ${skill.level})</span>
+  
+  // Add total allocation display
+  const totalDiv = document.createElement('div');
+  totalDiv.className = 'total-allocation';
+  const remainingAllocation = MAX_ALLOCATION - totalAllocationPercentage;
+  totalDiv.innerHTML = `
+    <div class="allocation-summary">
+      <span>Total Allocated: <strong>${totalAllocationPercentage}%</strong></span>
+      <span>Available: <strong>${remainingAllocation}%</strong></span>
+    </div>
+  `;
+  skillsList.appendChild(totalDiv);
+  
+  Object.values(skills).forEach((skill) => {
+    const skillDiv = document.createElement('div');
+    skillDiv.className = 'skill allocation-panel';
+    
+    // Calculate effect details
+    let effectDetail = '';
+    if (skill.key === 'computation') {
+      effectDetail = `<div class="skill-effect">Current Effect: +${skill.level} SCC/tick</div>`;
+    } else if (skill.key === 'memory') {
+      effectDetail = `<div class="skill-effect">Current Effect: Max SCC = ${100 + (skill.level - 1) * 50}</div>`;
+    }
+    
+    // Calculate XP progress percentage
+    const xpProgress = (skill.allocation.xp / skill.allocation.xpRequired) * 100;
+    
+    // Calculate SCC/tick allocation
+    const totalSCC = getSccPerTick();
+    const allocatedSCC = totalSCC * (skill.allocation.percentage / 100);
+    
+    // Calculate time to next level
+    const timeToLevel = skill.allocation.xp >= skill.allocation.xpRequired ? 
+      'Ready to level!' : 
+      allocatedSCC > 0 ? 
+        `${Math.ceil((skill.allocation.xpRequired - skill.allocation.xp) / allocatedSCC)}s to level` :
+        'No allocation - no progress';
+    
+    skillDiv.innerHTML = `
+      <div class="skill-header">
+        <span class="skill-name">${skill.name} (Lv. ${skill.level})</span>
+      </div>
+      <div class="skill-desc">${skill.desc}</div>
+      ${effectDetail}
+      <div class="xp-container">
+        <div class="xp-info">XP: ${Math.floor(skill.allocation.xp)}/${skill.allocation.xpRequired}</div>
+        <div class="xp-progress-bar">
+          <div class="xp-progress-fill" style="width: ${xpProgress}%"></div>
         </div>
-        <div class="skill-desc">${skill.desc}</div>
-        ${effectDetail}
-        <div class="skill-upgrade-btn-container">
-          <button class="upgrade-btn" data-skill="${skill.key}">Upgrade (${getSkillCost(skill)})</button>
+        <div class="time-to-level">${timeToLevel}</div>
+      </div>
+      <div class="allocation-container">
+        <label class="allocation-label">
+          Allocation: <span class="allocation-percentage">${skill.allocation.percentage}%</span> 
+          (${allocatedSCC.toFixed(1)} SCC/tick)
+        </label>
+        <input type="range" class="allocation-slider" 
+               min="0" max="100" step="1" 
+               value="${skill.allocation.percentage}"
+               data-skill="${skill.key}">
+        <div class="allocation-controls">
+          <button class="allocation-btn" data-skill="${skill.key}" data-action="decrease1">-1</button>
+          <button class="allocation-btn" data-skill="${skill.key}" data-action="decrease5">-5</button>
+          <button class="allocation-btn" data-skill="${skill.key}" data-action="decrease10">-10</button>
+          <button class="allocation-btn" data-skill="${skill.key}" data-action="increase1">+1</button>
+          <button class="allocation-btn" data-skill="${skill.key}" data-action="increase5">+5</button>
+          <button class="allocation-btn" data-skill="${skill.key}" data-action="increase10">+10</button>
+          <button class="allocation-btn zero-btn" data-skill="${skill.key}" data-action="zero">0</button>
         </div>
-      `;
-      skillsList.appendChild(skillDiv);
+      </div>
+    `;
+    
+    skillsList.appendChild(skillDiv);
+    
+    // Add event listeners for allocation controls
+    const slider = skillDiv.querySelector('.allocation-slider') as HTMLInputElement;
+    const buttons = skillDiv.querySelectorAll('.allocation-btn');
+    
+    if (slider) {
+      slider.addEventListener('input', (e) => {
+        const newPercentage = parseInt((e.target as HTMLInputElement).value);
+        updateAllocation(skill, newPercentage);
+      });
       
-      // Add event listener for upgrade button
-      const upgradeBtn = skillDiv.querySelector('.upgrade-btn') as HTMLButtonElement;
-      if (upgradeBtn) {
-        upgradeBtn.disabled = scc < getSkillCost(skill);
-        upgradeBtn.onclick = () => {
-          if (scc >= getSkillCost(skill)) {
-            scc -= getSkillCost(skill);
-            skill.level++;
-            updateSccUI();
-            renderSkills();
-          }
-        };
-      }
+      // Disable slider if no allocation available and skill is at 0
+      const availableAllocation = MAX_ALLOCATION - totalAllocationPercentage + skill.allocation.percentage;
+      slider.disabled = availableAllocation === 0 && skill.allocation.percentage === 0;
+    }
+    
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        const action = button.getAttribute('data-action');
+        let newPercentage = skill.allocation.percentage;
+        
+        switch (action) {
+          case 'decrease1':
+            newPercentage = Math.max(0, skill.allocation.percentage - 1);
+            break;
+          case 'decrease5':
+            newPercentage = Math.max(0, skill.allocation.percentage - 5);
+            break;
+          case 'decrease10':
+            newPercentage = Math.max(0, skill.allocation.percentage - 10);
+            break;
+          case 'increase1':
+            newPercentage = Math.min(100, skill.allocation.percentage + 1);
+            break;
+          case 'increase5':
+            newPercentage = Math.min(100, skill.allocation.percentage + 5);
+            break;
+          case 'increase10':
+            newPercentage = Math.min(100, skill.allocation.percentage + 10);
+            break;
+          case 'zero':
+            newPercentage = 0;
+            break;
+        }
+        
+        updateAllocation(skill, newPercentage);
+      });
     });
+    
+    // Update button states based on current allocation
+    updateAllocationButtonStates(skillDiv, skill);
+  });
+  
+  // Update all button states after rendering
+  updateAllAllocationButtonStates();
 }
 
-function updateSkillButtonStates() {
-  Object.values(skills).forEach((skill) => {
-    const upgradeBtn = document.querySelector(`[data-skill="${skill.key}"]`) as HTMLButtonElement;
-    if (upgradeBtn) {
-      upgradeBtn.disabled = scc < getSkillCost(skill);
+function updateAllocationButtonStates(skillDiv: HTMLElement, skill: Skill) {
+  const buttons = skillDiv.querySelectorAll('.allocation-btn');
+  const availableAllocation = MAX_ALLOCATION - totalAllocationPercentage + skill.allocation.percentage;
+  
+  buttons.forEach(button => {
+    const action = button.getAttribute('data-action');
+    const btn = button as HTMLButtonElement;
+    
+    switch (action) {
+      case 'decrease1':
+      case 'decrease5':
+      case 'decrease10':
+        btn.disabled = skill.allocation.percentage === 0;
+        break;
+      case 'increase1':
+        btn.disabled = availableAllocation < 1;
+        break;
+      case 'increase5':
+        btn.disabled = availableAllocation < 5;
+        break;
+      case 'increase10':
+        btn.disabled = availableAllocation < 10;
+        break;
+      case 'zero':
+        btn.disabled = skill.allocation.percentage === 0;
+        break;
     }
   });
+}
+
+function updateAllAllocationButtonStates() {
+  Object.values(skills).forEach(skill => {
+    const skillDiv = document.querySelector(`[data-skill="${skill.key}"]`)?.closest('.allocation-panel');
+    if (skillDiv) {
+      updateAllocationButtonStates(skillDiv as HTMLElement, skill);
+    }
+  });
+}
+
+function updateAllocation(skill: Skill, newPercentage: number) {
+  const oldPercentage = skill.allocation.percentage;
+  const difference = newPercentage - oldPercentage;
+  
+  // Check if new total allocation would exceed 100%
+  if (totalAllocationPercentage + difference > MAX_ALLOCATION) {
+    // Can't exceed 100% allocation
+    return;
+  }
+  
+  // Update allocation
+  skill.allocation.percentage = newPercentage;
+  totalAllocationPercentage += difference;
+  
+  // Re-render to show changes and update button states
+  renderSkills();
+  updateSccUI();
+}
+
+function processAllocation() {
+  const totalSCC = getSccPerTick();
+  
+  Object.values(skills).forEach(skill => {
+    // Calculate SCC allocated to this skill
+    const allocatedSCC = totalSCC * (skill.allocation.percentage / 100);
+    
+    // Convert to XP (1:1 ratio)
+    skill.allocation.xp += allocatedSCC;
+    
+    // Check for level up
+    if (skill.allocation.xp >= skill.allocation.xpRequired) {
+      levelUpSkill(skill);
+    }
+  });
+  
+  // Add unallocated SCC to storage
+  const unallocatedPercentage = MAX_ALLOCATION - totalAllocationPercentage;
+  const unallocatedSCC = totalSCC * (unallocatedPercentage / 100);
+  return unallocatedSCC;
+}
+
+function levelUpSkill(skill: Skill) {
+  skill.level++;
+  skill.allocation.xp = 0;
+  skill.allocation.xpRequired = calculateXPRequirement(skill.level + 1);
+  
+  // Visual feedback for level up
+  console.log(`${skill.name} leveled up to ${skill.level}!`);
 }
 // SCC (Stolen CPU Cycles) state and tick logic
 let scc = 0;
@@ -156,8 +349,6 @@ function updateSccUI() {
       sccRiskElement.style.fontWeight = 'normal';
     }
   }
-  
-  updateSkillButtonStates();
 }
 
 function tick() {
@@ -165,7 +356,12 @@ function tick() {
   
   // Update SCC_MAX based on Memory level
   SCC_MAX = 100 + (skills.memory.level - 1) * 50;
-  scc += getSccPerTick();
+  
+  const unallocatedSCC = processAllocation();
+  scc += unallocatedSCC;
+  
+  updateSccUI();
+  renderSkills(); // Update skill displays with current XP progress
   
   // Check for game over (allows temporary overflow for risk calculation)
   if (checkGameOver()) {

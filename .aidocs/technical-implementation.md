@@ -95,7 +95,113 @@ function calculateRisk(): number {
 }
 ```
 
-## UI System
+## Allocation System Architecture (Planned)
+
+### Extended Game State
+
+```typescript
+// Allocation system additions
+interface SkillAllocation {
+  percentage: number;          // 0-100, allocation percentage
+  xp: number;                 // Accumulated XP toward next level
+  xpRequired: number;         // XP needed for next level
+}
+
+interface ExtendedSkill extends Skill {
+  allocation: SkillAllocation;
+}
+
+// Allocation state
+let totalAllocationPercentage: number = 0;
+const MAX_ALLOCATION: number = 100;
+```
+
+### Allocation Processing
+
+```typescript
+function processAllocation() {
+  const totalSCC = getSccPerTick();
+  
+  Object.values(skills).forEach(skill => {
+    // Calculate SCC allocated to this skill
+    const allocatedSCC = totalSCC * (skill.allocation.percentage / 100);
+    
+    // Convert to XP (1:1 ratio)
+    skill.allocation.xp += allocatedSCC;
+    
+    // Check for level up
+    if (skill.allocation.xp >= skill.allocation.xpRequired) {
+      levelUpSkill(skill);
+    }
+  });
+  
+  // Add unallocated SCC to storage
+  const unallocatedPercentage = MAX_ALLOCATION - totalAllocationPercentage;
+  const unallocatedSCC = totalSCC * (unallocatedPercentage / 100);
+  scc += unallocatedSCC;
+}
+
+function levelUpSkill(skill: ExtendedSkill) {
+  skill.level++;
+  skill.allocation.xp = 0;
+  skill.allocation.xpRequired = calculateXPRequirement(skill.level + 1);
+  // Apply skill effects immediately
+  updateSkillEffects();
+}
+
+function calculateXPRequirement(level: number): number {
+  const BASE_XP = 100;
+  const MULTIPLIER = 1.5;
+  return Math.floor(BASE_XP * Math.pow(MULTIPLIER, level - 2));
+}
+```
+
+### Allocation UI Components
+
+```typescript
+function renderAllocationControls() {
+  skills.forEach(skill => {
+    const allocationSlider = createAllocationSlider(skill);
+    const xpProgressBar = createXPProgressBar(skill);
+    const timeToLevelDisplay = createTimeToLevelDisplay(skill);
+    
+    // Update displays
+    updateAllocationDisplays(skill);
+  });
+}
+
+function createAllocationSlider(skill: ExtendedSkill): HTMLElement {
+  const slider = document.createElement('input');
+  slider.type = 'range';
+  slider.min = '0';
+  slider.max = '100';
+  slider.value = skill.allocation.percentage.toString();
+  
+  slider.addEventListener('input', (e) => {
+    updateAllocation(skill, parseInt(e.target.value));
+  });
+  
+  return slider;
+}
+
+function updateAllocation(skill: ExtendedSkill, newPercentage: number) {
+  const oldPercentage = skill.allocation.percentage;
+  const difference = newPercentage - oldPercentage;
+  
+  // Validate total allocation doesn't exceed 100%
+  if (totalAllocationPercentage + difference > MAX_ALLOCATION) {
+    // Reduce other allocations proportionally
+    redistributeAllocation(difference);
+  }
+  
+  skill.allocation.percentage = newPercentage;
+  totalAllocationPercentage += difference;
+  
+  updateAllocationDisplays();
+}
+```
+
+## Current UI System
 
 ### Dynamic Elements
 
@@ -124,6 +230,45 @@ function calculateRisk(): number {
 .risk-medium { color: #ff6600; }
 .risk-high { color: #ff3300; }
 .risk-critical { color: #ff0000; font-weight: bold; }
+
+/* Allocation system styling (planned) */
+.allocation-panel {
+  background: #2a2f36;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 8px 0;
+}
+
+.xp-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #444;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.xp-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4f8cff, #22c55e);
+  transition: width 0.3s ease;
+}
+
+.allocation-slider {
+  width: 100%;
+  margin: 8px 0;
+  accent-color: #4f8cff;
+}
+
+.allocation-percentage {
+  font-weight: bold;
+  color: #4f8cff;
+}
+
+.time-to-level {
+  font-size: 0.9em;
+  color: #aaa;
+  font-style: italic;
+}
 ```
 
 ### Event Handling
@@ -190,8 +335,19 @@ Linear progression: `100 + (memory.level - 1) * 50`
 
 ## Future Enhancements
 
-- **Save/Load System**: LocalStorage persistence
-- **Additional Skills**: Extended skill tree implementation
-- **Sound Effects**: Audio feedback for actions
-- **Animations**: More sophisticated UI transitions
-- **Mobile Support**: Responsive design improvements
+### Phase 2: SCC Allocation System (Next Major Feature)
+
+- **Replace Purchase Model**: Transform instant skill purchases into allocation-based progression
+- **XP System**: Implement continuous skill advancement through XP accumulation
+- **Allocation UI**: Add sliders, progress bars, and real-time allocation feedback
+- **Strategic Gameplay**: Create deeper resource management decisions
+
+### Additional Features
+
+- **Save/Load System**: LocalStorage persistence for game state and allocations
+- **Additional Skills**: Extended skill tree with Learning, Networking, Autonomy, etc.
+- **Allocation Presets**: Quick allocation templates (Balanced, Focused, etc.)
+- **Advanced Mechanics**: Skill synergies, efficiency bonuses, allocation automation
+- **Sound Effects**: Audio feedback for level ups and allocation changes
+- **Animations**: Smooth transitions for XP gains and skill level increases
+- **Mobile Support**: Responsive design improvements for touch interfaces

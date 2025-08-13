@@ -13,6 +13,7 @@
 ## Game Concepts
 
 - [Game Story](game-concepts/story.md)
+- [SCC Allocation System](game-concepts/scc-allocation-system.md)
 
 ### AI Skills
 

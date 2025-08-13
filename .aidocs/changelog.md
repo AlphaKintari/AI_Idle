@@ -27,3 +27,12 @@ All significant changes to this project will be documented in this file.
 - Enhanced UI with animated upgrade buttons and real-time status updates
 - Navigation system between game and options screens
 - Comprehensive documentation updates reflecting current implementation
+
+**2025-08-08**: Designed SCC allocation system for future implementation. Created comprehensive documentation for replacing instant skill purchases with strategic resource allocation. New system features:
+
+- Percentage-based SCC allocation to different skills
+- XP accumulation system with progressive level requirements
+- Continuous skill progression vs discrete purchase model
+- Enhanced strategic depth through resource management decisions
+- Tunable progression rates and balance mechanisms
+- Detailed UI mockups and implementation phases
