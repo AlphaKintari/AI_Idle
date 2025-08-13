@@ -328,10 +328,31 @@ Linear progression: `100 + (memory.level - 1) * 50`
 
 ## Development Workflow
 
-1. Edit TypeScript files in `src/`
-2. Run `npx tsc` to compile to JavaScript
-3. Open `src/index.html` in browser to test
-4. Use VS Code extensions for linting and formatting
+### TypeScript Watch Mode (Recommended)
+
+**Always start TypeScript watch mode for auto-compilation:**
+
+```bash
+cd src/
+npx tsc --watch
+```
+
+This provides:
+
+- **Auto-compilation**: Changes to `.ts` files automatically compile to `.js`
+- **Real-time errors**: TypeScript errors show immediately on save
+- **Hot development**: Edit → Save → Refresh browser workflow
+- **Background processing**: Runs continuously without blocking work
+
+### Manual Development Process
+
+1. **Start TypeScript Watch**: `npx tsc --watch` (in src/ directory)
+2. Edit TypeScript files in `src/`
+3. **Auto-compile**: Watch mode handles compilation automatically  
+4. Open `src/index.html` in browser to test
+5. Use VS Code extensions for linting and formatting
+
+**Note**: Always prefer watch mode over manual `npx tsc` compilation for active development.
 
 ## Future Enhancements
 
